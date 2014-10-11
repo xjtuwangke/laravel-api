@@ -139,6 +139,15 @@ class BasicAPIController extends \Controller{
         return $this->response();
     }
 
+    protected function skipCheck(){
+        if( in_array( \App::environment() , [ 'local' , 'test' , 'beta' ] ) ){
+            if( $this->getParameter( 'debug' ) == 1 ){
+                $this->debugMessage( '跳过verify' );
+                return true;
+            }
+        }
+    }
+
     protected function check(){
         return $this->check_required();
     }
