@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Response;
 
 class BasicAPIController extends \Controller{
 
+    use RequiredParametersTrait;
+
     const MethodPost = 'post';
     const MethodGet  = 'get';
     const MethodAny  = 'any';
@@ -128,8 +130,17 @@ class BasicAPIController extends \Controller{
             default:
                 $this->parameters = Input::all();
         }
-        $this->handle();
+        if( $this->check() ){
+            $this->handle();
+        }
+        else{
+            $this->debugMessage( '验证check()函数没有通过' );
+        }
         return $this->response();
+    }
+
+    protected function check(){
+        return $this->check_required();
     }
 
     protected function handle(){
