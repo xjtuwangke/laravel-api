@@ -157,7 +157,18 @@ class BasicAPIController extends \Controller{
     }
 
     protected function onResponding(){
-
+        $message = static::getAction();
+        $context = array(
+            'input' => $this->parameters ,
+            'response' => $this->response ,
+            'errors'  => $this->errors ,
+        );
+        if( $this->hasError() ){
+            APILogger::warning( $message , $context );
+        }
+        else{
+            APILogger::access( $message , $context );
+        }
     }
 
     protected function response(){
