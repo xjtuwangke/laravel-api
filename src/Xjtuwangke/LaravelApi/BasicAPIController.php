@@ -162,6 +162,7 @@ class BasicAPIController extends \Controller{
             'input' => $this->parameters ,
             'response' => $this->response ,
             'errors'  => $this->errors ,
+            'header' => \Request::header() ,
         );
         if( $this->hasError() ){
             APILogger::warning( $message , $context );
