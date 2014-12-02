@@ -41,7 +41,7 @@ class BasicAPIController extends \Controller{
 
     protected $timestamp = 0;
 
-    protected $debug = true;
+    protected $debug = false;
 
     protected $debug_message = [];
 
@@ -142,6 +142,7 @@ class BasicAPIController extends \Controller{
     protected function skipCheck(){
         if( in_array( \App::environment() , [ 'local' , 'test' , 'beta' ] ) ){
             if( $this->getParameter( 'debug' ) == 1 ){
+                $this->debug = true;
                 $this->debugMessage( '跳过verify' );
                 return true;
             }
@@ -182,6 +183,9 @@ class BasicAPIController extends \Controller{
         }
         if( $this->debug ){
             $response['debug'] = $this->debug_message;
+        }
+        else{
+            $response['debug'] = array();
         }
         $this->response = array_merge( $this->response , $response );
         $this->onResponding();
