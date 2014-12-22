@@ -45,6 +45,8 @@ class BasicAPIController extends \Controller{
 
     protected $debug_message = [];
 
+    protected $cache = null;
+
     static public function getAction(){
         return str_replace( '/' , '.' , static::getUriPrefix() . static::getName() . '_' . static::getVersion() );
     }
@@ -63,6 +65,19 @@ class BasicAPIController extends \Controller{
 
     static public function getVersion(){
         return static::$version;
+    }
+
+    public function cacheConfig(){
+        return array(
+            'remember' => false ,
+            'minutes' => 10 ,
+            'flush' => false,
+            'tags' => array(
+                'api' ,
+                static::$version ,
+                static::$apiName ,
+                ) ,
+        );
     }
 
     static public function registerRoutes(){
@@ -131,7 +146,19 @@ class BasicAPIController extends \Controller{
                 $this->parameters = Input::all();
         }
         if( $this->check() ){
-            $this->handle();
+            $this->beforeHandle();
+            if( ! $this->cache ){
+                $this->cache = new BasicAPICacher();
+            }
+            if( $cache = $this->cache->read( $this ) ){
+                $this->response = $cache;
+                $this->debugMessage( '缓存命中' );
+            }
+            else{
+                $this->handle();
+                $this->cache->save( $this );
+            }
+            $this->afterHandle();
         }
         else{
             $this->debugMessage( '验证check()函数没有通过' );
@@ -153,7 +180,14 @@ class BasicAPIController extends \Controller{
         return $this->check_required();
     }
 
+    protected function beforeHandle(){
+    }
+
     protected function handle(){
+
+    }
+
+    protected function afterHandle(){
 
     }
 
